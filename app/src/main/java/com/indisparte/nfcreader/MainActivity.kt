@@ -2,12 +2,10 @@ package com.indisparte.nfcreader
 
 import android.app.PendingIntent
 import android.content.Intent
-import android.content.IntentFilter
 import android.nfc.NdefMessage
 import android.nfc.NfcAdapter
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.indisparte.nfcreader.databinding.ActivityMainBinding
@@ -44,23 +42,43 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        Log.i(TAG, "onResume: Enable foreground dispatch")
         nfcAdapter?.enableForegroundDispatch(this, mPendingIntent, null, null)
     }
 
     override fun onPause() {
         super.onPause()
+        Log.i(TAG, "onPause: Disable Foreground dispatch")
         nfcAdapter?.disableForegroundDispatch(this)
     }
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED == intent.action) {
-            intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)?.also { rawMessages ->
-                val messages: List<NdefMessage> = rawMessages.map { it as NdefMessage }
-                // Process the messages array.
-                parserNDEFMessage(messages)
+        val action = intent.action
+        when (action) {
+            NfcAdapter.ACTION_NDEF_DISCOVERED -> {
+                intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
+                    ?.also { rawMessages ->
+                        val messages: List<NdefMessage> = rawMessages.map { it as NdefMessage }
+                        // Process the messages array.
+                        parserNDEFMessage(messages)
+                    }
+            }
+
+            NfcAdapter.ACTION_TAG_DISCOVERED -> {
+                intent.getParcelableArrayExtra(NfcAdapter.EXTRA_TAG)?.also { rawMessages ->
+                    val messages: List<NdefMessage> = rawMessages.map { it as NdefMessage }
+                    // Process the messages array.
+//                    parserNDEFMessage(messages)
+                    Log.w(TAG, "onNewIntent: $messages")
+                }
+            }
+
+            Intent.ACTION_MAIN -> {
+                Log.i(TAG, "onNewIntent: Main intent")
             }
         }
+
     }
 
     private fun parserNDEFMessage(messages: List<NdefMessage>) {
@@ -73,7 +91,9 @@ class MainActivity : AppCompatActivity() {
             val str = record.str()
             builder.append(str).append("\n")
         }
+        Log.d(TAG, "parserNDEFMessage: $builder")
         nfcStatusText.text = builder.toString()
+
     }
 
     private fun checkNFCEnable(): Boolean {
