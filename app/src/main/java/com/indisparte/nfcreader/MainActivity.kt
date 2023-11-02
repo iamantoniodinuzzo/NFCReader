@@ -2,18 +2,25 @@ package com.indisparte.nfcreader
 
 import android.app.PendingIntent
 import android.content.Intent
+import android.content.IntentFilter
+import android.nfc.NdefMessage
 import android.nfc.NfcAdapter
-import android.nfc.NfcManager
-import android.nfc.Tag
-import android.nfc.TagLostException
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import com.indisparte.nfcreader.databinding.ActivityMainBinding
+import com.indisparte.nfcreader.parser.NdefMessageParser
 
 class MainActivity : AppCompatActivity() {
 
+    private val TAG = MainActivity::class.java.simpleName
     private lateinit var binding: ActivityMainBinding
+    private lateinit var nfcStatusText: TextView
     private var nfcAdapter: NfcAdapter? = null
+    private var mPendingIntent: PendingIntent? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,70 +28,60 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        nfcStatusText = binding.nfcStatusText
+
         // Inizializzazione del NfcAdapter
-        val nfcManager = getSystemService(NFC_SERVICE) as NfcManager
-        nfcAdapter = nfcManager.defaultAdapter
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this)
 
-        // Verifica se il dispositivo supporta l'NFC
-        if (nfcAdapter == null) {
-            // Il dispositivo non supporta l'NFC
-            binding.nfcStatusText.text = "NFC non supportato su questo dispositivo"
+
+        if (checkNFCEnable()) {
+            mPendingIntent =
+                PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
         } else {
-            // Imposta il click listener per il pulsante NFC
-            binding.nfcButton.setOnClickListener {
-                // Avvia l'attivazione dell'NFC
-                enableNfc()
-            }
-        }
-    }
-
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-
-        // Gestisci l'intent NFC quando un dispositivo NFC è rilevato
-        if (NfcAdapter.ACTION_TAG_DISCOVERED == intent?.action) {
-            val tag: Tag? = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
-
-            // Leggi i dati dal tag NFC
-            try {
-                // Qui puoi gestire la lettura dei dati dal tag NFC
-                // Ad esempio, puoi ottenere gli ID o i dati dal tag e mostrarli all'utente
-                // Esempio: val id = tag?.id
-                // Mostra i dati all'utente
-                binding.nfcStatusText.text = "Dati NFC rilevati: ${tag.toString()}"
-            } catch (e: TagLostException) {
-                // Il tag NFC è stato perso durante la lettura
-                binding.nfcStatusText.text = "Tag NFC perso durante la lettura"
-            }
-        }
-    }
-
-    private fun enableNfc() {
-        // Controlla se l'NFC è abilitato sul dispositivo
-        if (!nfcAdapter?.isEnabled!!) {
-            // Se l'NFC è disabilitato, mostra un messaggio all'utente per attivarlo
-            binding.nfcStatusText.text = "Si prega di attivare l'NFC"
-        } else {
-            // L'NFC è già abilitato, attende il rilevamento del dispositivo NFC
-            binding.nfcStatusText.text = "In attesa di un dispositivo NFC..."
+            nfcStatusText.text = getString(R.string.tv_noNfc)
         }
     }
 
     override fun onResume() {
         super.onResume()
-
-        val intent = Intent(this, this.javaClass)
-        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-
-        nfcAdapter?.enableForegroundDispatch(this, pendingIntent, null, null)
+        nfcAdapter?.enableForegroundDispatch(this, mPendingIntent, null, null)
     }
-
 
     override fun onPause() {
         super.onPause()
-        // Disabilita il dispatch NFC in pausa
         nfcAdapter?.disableForegroundDispatch(this)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED == intent.action) {
+            intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)?.also { rawMessages ->
+                val messages: List<NdefMessage> = rawMessages.map { it as NdefMessage }
+                // Process the messages array.
+                parserNDEFMessage(messages)
+            }
+        }
+    }
+
+    private fun parserNDEFMessage(messages: List<NdefMessage>) {
+        val builder = StringBuilder()
+        val records = NdefMessageParser.parse(messages[0])
+        val size = records.size
+
+        for (i in 0 until size) {
+            val record = records[i]
+            val str = record.str()
+            builder.append(str).append("\n")
+        }
+        nfcStatusText.text = builder.toString()
+    }
+
+    private fun checkNFCEnable(): Boolean {
+        return if (nfcAdapter == null) {
+            nfcStatusText.text = getString(R.string.tv_noNfc)
+            false
+        } else {
+            nfcAdapter?.isEnabled == true
+        }
     }
 }

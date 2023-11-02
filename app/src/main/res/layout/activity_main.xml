@@ -14,16 +14,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Hello World!" />
+        android:text="Scansiona un dispositivo HCE" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/nfc_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="Attiva NFC"
-        android:textAllCaps="false"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/nfc_status_text" />
 </androidx.constraintlayout.widget.ConstraintLayout>
