@@ -4,6 +4,7 @@ import android.app.PendingIntent
 import android.content.Intent
 import android.nfc.NdefMessage
 import android.nfc.NfcAdapter
+import android.nfc.Tag
 import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
@@ -66,12 +67,9 @@ class MainActivity : AppCompatActivity() {
             }
 
             NfcAdapter.ACTION_TAG_DISCOVERED -> {
-                intent.getParcelableArrayExtra(NfcAdapter.EXTRA_TAG)?.also { rawMessages ->
-                    val messages: List<NdefMessage> = rawMessages.map { it as NdefMessage }
-                    // Process the messages array.
-//                    parserNDEFMessage(messages)
-                    Log.w(TAG, "onNewIntent: $messages")
-                }
+                val tag: Tag? = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG) as Tag?
+                Log.i(TAG, "onNewIntent: Tag: $tag")
+
             }
 
             Intent.ACTION_MAIN -> {
