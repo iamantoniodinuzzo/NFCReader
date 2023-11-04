@@ -11,3 +11,5 @@ u
 Eapp/src/main/java/com/indisparte/nfcreader/parser/ParsedNdefRecord.kt,b\6\b63cc21c37b89a2f0c1bf7f1214ffcf87497c07b
 o
 ?app/src/main/java/com/indisparte/nfcreader/parser/TextRecord.kt,7\3\73b23a22fc5d3251a3345b66a6a597be10025f41
+g
+7app/src/main/java/com/indisparte/nfcreader/util/Util.kt,0\2\0273626b8b91e2d37268b6db8acdc781bd29c616
