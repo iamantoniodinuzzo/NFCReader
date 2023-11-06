@@ -14,7 +14,13 @@ import com.indisparte.nfcreader.parser.NdefMessageParser
 import com.indisparte.nfcreader.util.Util.logMessage
 import com.indisparte.nfcreader.util.Util.scrollDown
 
-
+/**
+ * The main activity for handling NFC (Near Field Communication) functionality.
+ * This activity checks if NFC is supported and enabled on the device and uses the
+ * NFC Reader Mode to detect NFC tags. It provides methods for processing NDEF (NFC Data Exchange Format)
+ * messages and displaying the message content.
+ * @author Antonio Di Nuzzo
+ */
 class MainActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
 
     private val TAG = MainActivity::class.java.simpleName
