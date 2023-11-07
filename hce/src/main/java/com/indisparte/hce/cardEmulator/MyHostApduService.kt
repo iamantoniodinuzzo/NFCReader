@@ -4,9 +4,14 @@ import android.app.Service
 import android.content.Intent
 import android.nfc.NdefMessage
 import android.nfc.NdefRecord
+import android.nfc.NdefRecord.createTextRecord
 import android.nfc.cardemulation.HostApduService
 import android.os.Bundle
 import android.util.Log
+import com.indisparte.hce.util.Constants.HEX_CHARS
+import com.indisparte.hce.util.Util
+import com.indisparte.hce.util.Util.fillByteArrayToFixedDimension
+import com.indisparte.hce.util.toHex
 import java.io.UnsupportedEncodingException
 import java.math.BigInteger
 
@@ -101,7 +106,7 @@ class MyHostApduService : HostApduService() {
 
     private val NDEF_ID = byteArrayOf(0xE1.toByte(), 0x04.toByte())
 
-    private var NDEF_URI = NdefMessage(createTextRecord("en", "Ciao, come va?", NDEF_ID))
+    private var NDEF_URI = NdefMessage(Util.createTextRecord("en", "Default message", NDEF_ID))
     private var NDEF_URI_BYTES = NDEF_URI.toByteArray()
     private var NDEF_URI_LEN = fillByteArrayToFixedDimension(
         BigInteger.valueOf(NDEF_URI_BYTES.size.toLong()).toByteArray(),
@@ -111,7 +116,7 @@ class MyHostApduService : HostApduService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent?.hasExtra("ndefMessage")!!) {
             NDEF_URI =
-                NdefMessage(createTextRecord("en", intent.getStringExtra("ndefMessage")!!, NDEF_ID))
+                NdefMessage(Util.createTextRecord("en", intent.getStringExtra("ndefMessage")!!, NDEF_ID))
 
             NDEF_URI_BYTES = NDEF_URI.toByteArray()
             NDEF_URI_LEN = fillByteArrayToFixedDimension(
@@ -224,70 +229,11 @@ class MyHostApduService : HostApduService() {
         Log.i(TAG, "onDeactivated() Fired! Reason: $reason")
     }
 
-    private val HEX_CHARS = "0123456789ABCDEF".toCharArray()
 
-    private fun ByteArray.toHex(): String {
-        val result = StringBuffer()
 
-        forEach {
-            val octet = it.toInt()
-            val firstIndex = (octet and 0xF0).ushr(4)
-            val secondIndex = octet and 0x0F
-            result.append(HEX_CHARS[firstIndex])
-            result.append(HEX_CHARS[secondIndex])
-        }
 
-        return result.toString()
-    }
 
-    fun String.hexStringToByteArray(): ByteArray {
-        val result = ByteArray(length / 2)
 
-        for (i in indices step 2) {
-            val firstIndex = HEX_CHARS.indexOf(this[i])
-            val secondIndex = HEX_CHARS.indexOf(this[i + 1])
-
-            val octet = firstIndex.shl(4).or(secondIndex)
-            result[i.shr(1)] = octet.toByte()
-        }
-
-        return result
-    }
-
-    private fun createTextRecord(language: String, text: String, id: ByteArray): NdefRecord {
-        val languageBytes: ByteArray
-        val textBytes: ByteArray
-        try {
-            languageBytes = language.toByteArray(charset("US-ASCII"))
-            textBytes = text.toByteArray(charset("UTF-8"))
-        } catch (e: UnsupportedEncodingException) {
-            throw AssertionError(e)
-        }
-
-        val recordPayload = ByteArray(1 + (languageBytes.size and 0x03F) + textBytes.size)
-
-        recordPayload[0] = (languageBytes.size and 0x03F).toByte()
-        System.arraycopy(languageBytes, 0, recordPayload, 1, languageBytes.size and 0x03F)
-        System.arraycopy(
-            textBytes,
-            0,
-            recordPayload,
-            1 + (languageBytes.size and 0x03F),
-            textBytes.size,
-        )
-
-        return NdefRecord(NdefRecord.TNF_WELL_KNOWN, NdefRecord.RTD_TEXT, id, recordPayload)
-    }
-
-    private fun fillByteArrayToFixedDimension(array: ByteArray, fixedSize: Int): ByteArray {
-        if (array.size == fixedSize) {
-            return array
-        }
-
-        val start = byteArrayOf(0x00.toByte())
-        val filledArray = ByteArray(start.size + array.size)
-        System.arraycopy(start, 0, filledArray, 0, start.size)
-        System.arraycopy(array, 0, filledArray, start.size, array.size)
-        return fillByteArrayToFixedDimension(filledArray, fixedSize)
-    }
 }
+
+
