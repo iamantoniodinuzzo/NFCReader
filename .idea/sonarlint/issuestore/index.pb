@@ -27,3 +27,9 @@ w
 Ghce/src/main/java/com/indisparte/hce/cardEmulator/KHostApduService.java,1\7\17770622a6ccbc0d46146954c9a6f690b48f94b3
 v
 Fhce/src/main/java/com/indisparte/hce/cardEmulator/MyHostApduService.kt,0\1\01d9c406de0153228329b9fb12f646088b135e93
+a
+1hce/src/main/java/com/indisparte/hce/util/Util.kt,a\4\a44795269bd953bcf470f7f866e7362c99ceee39
+n
+>hce/src/main/java/com/indisparte/hce/util/ExtensionFunction.kt,b\5\b58f40cd6b1f198b7b6c663cf4892ccbcb8ddfb4
+f
+6hce/src/main/java/com/indisparte/hce/util/Constants.kt,c\8\c8ab74d73fe41ac8813947af8e0b267d2d4be6c1
