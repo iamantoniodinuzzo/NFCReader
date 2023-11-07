@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "NFCReader"
 include ':app'
+include ':hce'

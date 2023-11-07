@@ -13,3 +13,17 @@ o
 ?app/src/main/java/com/indisparte/nfcreader/parser/TextRecord.kt,7\3\73b23a22fc5d3251a3345b66a6a597be10025f41
 g
 7app/src/main/java/com/indisparte/nfcreader/util/Util.kt,0\2\0273626b8b91e2d37268b6db8acdc781bd29c616
+@
+app/build.gradle,f\4\f4a01d6a4fcb971362ec00a83903fd3902f52164
+P
+ hce/src/main/AndroidManifest.xml,3\6\3652d81104e2c290a2e053865ffb91f30a790c94
+u
+Ehce/src/main/java/com/indisparte/hce/cardEmulator/KHostApduService.kt,1\1\110df55040b8fa322913e1f6d6b4d36a86a7d61b
+l
+<hce/src/main/java/com/indisparte/hce/CardEmulatorActivity.kt,8\0\80c3f3906e155974da1a2ab268c48be6e228a3ba
+@
+hce/build.gradle,4\2\429814ecebadb4deb32cd81c34016d0bd43fdd00
+w
+Ghce/src/main/java/com/indisparte/hce/cardEmulator/KHostApduService.java,1\7\17770622a6ccbc0d46146954c9a6f690b48f94b3
+v
+Fhce/src/main/java/com/indisparte/hce/cardEmulator/MyHostApduService.kt,0\1\01d9c406de0153228329b9fb12f646088b135e93

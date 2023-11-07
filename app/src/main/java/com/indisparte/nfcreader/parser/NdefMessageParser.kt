@@ -5,7 +5,8 @@ import android.nfc.NdefRecord
 
 
 /**
- * Helper object for parsing NDEF (NFC Data Exchange Format) messages and extracting their contents.
+ * Helper class for parsing NDEF (NFC Data Exchange Format) messages and extracting their contents.
+ *
  * @author Antonio Di Nuzzo
  */
 object NdefMessageParser {
@@ -28,14 +29,17 @@ object NdefMessageParser {
      */
     private fun getRecords(records: Array<NdefRecord>): List<ParsedNdefRecord> {
         return records.map { record ->
-            if (TextRecord.isText(record)) {
-                TextRecord.parse(record) ?: createGenericParsedRecord(record)
-            } else {
-                createGenericParsedRecord(record)
-            }
+            val parsedRecord = TextRecord.parse(record) ?: createGenericParsedRecord(record)
+            parsedRecord
         }
     }
 
+    /**
+     * Creates a generic parsed NDEF record.
+     *
+     * @param record The NDEF record to parse.
+     * @return A generic parsed NDEF record.
+     */
     private fun createGenericParsedRecord(record: NdefRecord): ParsedNdefRecord {
         return object : ParsedNdefRecord {
             override fun str(): String {
@@ -43,5 +47,5 @@ object NdefMessageParser {
             }
         }
     }
-
 }
+
